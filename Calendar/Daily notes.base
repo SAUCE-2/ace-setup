@@ -1,0 +1,88 @@
+filters:
+  and:
+    - file.inFolder("Calendar")
+    - file.ext == "md"
+    - date(file.basename)
+formulas:
+  weekday: date(file.basename).format("dddd")
+  month: date(file.basename).format("YYYY-MM")
+  year: date(file.basename).year
+  prev: link((date(file.basename) - "1d").format("YYYY-MM-DD"), "←")
+  next: link((date(file.basename) + "1d").format("YYYY-MM-DD"), "→")
+properties:
+  formula.weekday:
+    displayName: day
+  formula.month:
+    displayName: month
+  formula.year:
+    displayName: year
+  formula.prev:
+    displayName: prev
+  formula.next:
+    displayName: next
+views:
+  - type: table
+    name: All
+    order:
+      - file.name
+      - formula.weekday
+      - file.mtime
+    sort:
+      - property: formula.next
+        direction: ASC
+      - property: file.name
+        direction: DESC
+  - type: table
+    name: By month
+    groupBy:
+      property: formula.month
+      direction: DESC
+    order:
+      - file.name
+      - formula.weekday
+      - formula.prev
+      - formula.next
+    sort:
+      - property: file.name
+        direction: DESC
+  - type: table
+    name: This week
+    filters:
+      and:
+        - date(file.basename) >= today() - "7d"
+        - date(file.basename) <= today()
+    order:
+      - file.name
+      - formula.weekday
+      - formula.prev
+      - formula.next
+    sort:
+      - property: file.name
+        direction: DESC
+  - type: table
+    name: This month
+    filters:
+      and:
+        - date(file.basename).month == today().month
+    order:
+      - file.name
+      - formula.weekday
+      - formula.prev
+      - formula.next
+    sort:
+      - property: file.name
+        direction: DESC
+  - type: table
+    name: This year
+    filters:
+      and:
+        - date(file.basename).year == today().year
+    groupBy:
+      property: formula.month
+      direction: DESC
+    order:
+      - file.name
+      - formula.weekday
+      - formula.prev
+      - formula.next
+    sort: []

@@ -1,0 +1,104 @@
+filters:
+  and:
+    - file.ext == "md"
+    - file.hasTag("effort", "project")
+    - file.inFolder("Efforts")
+formulas:
+  stale: file.mtime < now() - "14d"
+  shared: if(projects.length > 1, "shared", "")
+properties:
+  formula.stale:
+    displayName: stale
+  formula.shared:
+    displayName: shared
+  projects:
+    displayName: Projects
+  status:
+    displayName: Status
+views:
+  - type: table
+    name: Projects
+    filters:
+      and:
+        - file.hasTag("project")
+    order:
+      - file.name
+      - status
+      - file.mtime
+    sort:
+      - property: file.mtime
+        direction: DESC
+  - type: table
+    name: Active
+    filters:
+      and:
+        - file.hasTag("effort")
+        - status == "active"
+    order:
+      - file.name
+      - projects
+      - status
+      - file.mtime
+    sort:
+      - property: file.mtime
+        direction: DESC
+  - type: table
+    name: By project
+    filters:
+      and:
+        - file.hasTag("effort")
+    groupBy:
+      property: projects
+      direction: ASC
+    order:
+      - file.name
+      - projects
+      - status
+      - file.mtime
+    sort:
+      - property: file.name
+        direction: ASC
+  - type: table
+    name: Shared
+    filters:
+      and:
+        - file.hasTag("effort")
+        - projects.length > 1
+    order:
+      - file.name
+      - projects
+      - status
+      - file.mtime
+    sort:
+      - property: file.name
+        direction: ASC
+  - type: table
+    name: All by status
+    filters:
+      and:
+        - file.hasTag("effort")
+    groupBy:
+      property: status
+      direction: ASC
+    order:
+      - file.name
+      - projects
+      - status
+      - file.mtime
+    sort:
+      - property: file.name
+        direction: ASC
+  - type: table
+    name: Stale
+    filters:
+      and:
+        - file.hasTag("effort")
+        - formula.stale == true
+    order:
+      - file.name
+      - projects
+      - status
+      - file.mtime
+    sort:
+      - property: file.mtime
+        direction: ASC

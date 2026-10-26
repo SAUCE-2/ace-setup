@@ -1,0 +1,55 @@
+filters:
+  and:
+    - file.ext == "md"
+properties:
+  file.tags:
+    displayName: Tags
+views:
+  - type: table
+    name: Links to here
+    filters:
+      and:
+        - file.hasLink(this.file)
+    order:
+      - file.name
+      - tags
+      - file.folder
+    sort:
+      - property: file.name
+        direction: ASC
+  - type: table
+    name: Linked from here
+    filters:
+      and:
+        - this.file.hasLink(file)
+    order:
+      - file.name
+      - tags
+      - file.folder
+    sort:
+      - property: file.name
+        direction: ASC
+  - type: table
+    name: Same tags
+    filters:
+      and:
+        - file.tags.filter(this.file.tags.contains(value)).length > 0
+        - file.path != this.file.path
+    order:
+      - file.name
+      - tags
+    sort:
+      - property: file.name
+        direction: ASC
+  - type: table
+    name: In Calendar
+    filters:
+      and:
+        - file.inFolder("Calendar")
+        - file.hasLink(this.file)
+    order:
+      - file.name
+      - tags
+    sort:
+      - property: file.name
+        direction: DESC
